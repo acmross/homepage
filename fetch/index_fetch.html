@@ -1,0 +1,494 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Fetch: Operational Backbone for Against All Oddz</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --navy: #2d5a78;
+  --navy2: #3d6a8b;
+  --orange: #d48f4c;
+  --peach: #f9e3cb;
+  --peach2: #f8cb92;
+  --red: #a83226;
+  --amber: #e8c25c;
+  --teal: #4a8a85;
+  --ink: #2a1206;
+  --muted: #55636f;
+  --bg: #f8fbfe;
+  --card: #ffffff;
+  --line: #d6e3ea;
+  --ico: #b8642c;
+  --bar: #2d5a78;
+  --arr: #a7b6c8;
+  --head: "Fredoka", "Trebuchet MS", "Segoe UI", Arial, sans-serif;
+  --body: "Inter", Arial, "Helvetica Neue", sans-serif;
+  box-sizing: border-box;
+  padding-top: env(safe-area-inset-top, 0px);
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+}
+/* Slides always keep the brand palette. Only the page around the deck follows light or dark. */
+:root { --page: #e9f1f5; --ctl-bg: #ffffff; --ctl-fg: #2d5a78; --ctl-mute: #55636f; --ctl-dot: #cbd9e1; }
+@media (prefers-color-scheme: dark) { :root { --page: #1a1d21; --ctl-bg: #2b3036; --ctl-fg: #e6eef3; --ctl-mute: #aab6bf; --ctl-dot: #4a525a; } }
+html { scroll-padding-top: env(safe-area-inset-top, 0px); height: 100%; }
+* { box-sizing: border-box; }
+body { margin: 0; height: 100%; background: var(--page); font-family: var(--body); color: var(--navy); overflow: hidden; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; text-rendering: optimizeLegibility; font-kerning: normal; }
+#app { height: 100%; display: flex; flex-direction: column; }
+#viewport { flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center; padding: 8px; }
+#frame { position: relative; flex: none; border-radius: 12px; overflow: hidden; box-shadow: 0 8px 30px rgba(0,0,0,.18); }
+#stage { position: absolute; left: 0; top: 0; width: 1280px; height: 720px; transform-origin: 0 0; background: var(--bg); }
+.slide { position: absolute; inset: 0; visibility: hidden; padding: 56px 72px; }
+.slide.active { visibility: visible; animation: fade .35s ease; }
+@keyframes fade { from { opacity: 0; transform: translateX(14px); } to { opacity: 1; transform: none; } }
+.eyebrow { font: 700 15px var(--body); letter-spacing: .16em; color: var(--orange); text-transform: uppercase; }
+.eyebrow.ln { font-size: 12px; display: flex; align-items: center; gap: 16px; }
+.eyebrow.ln::after { content: ""; flex: 1; height: 1px; background: var(--line); }
+h1, h2 { font-family: var(--head); font-weight: 700; letter-spacing: -.005em; margin: 4px 0 0; color: var(--navy); }
+h2 { font-size: 54px; line-height: 1.08; }
+.card { background: var(--card); border-radius: 18px; box-shadow: 0 6px 22px rgba(20,50,80,.14); }
+.foot { position: absolute; left: 72px; right: 72px; bottom: 34px; font-size: 14px; color: var(--muted); }
+.chip { position: absolute; left: 0; top: 0; transition: transform .95s cubic-bezier(.65,0,.35,1); background: var(--card); border-radius: 999px; padding: 11px 24px; font: 500 19px var(--body); color: var(--navy); box-shadow: 0 3px 12px rgba(28,90,122,.16); white-space: nowrap; display: flex; align-items: center; gap: 10px; }
+.chip svg { color: var(--ico); flex: none; }
+#morph { position: absolute; inset: 0; pointer-events: none; opacity: 0; transition: opacity .4s ease; z-index: 2; }
+#morph.show { opacity: 1; }
+#morph.snap .chip { transition: none; }
+#morph .hub { position: absolute; width: 124px; height: 124px; border-radius: 50%; background: var(--navy); color: #fff; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; font: 700 22px var(--head); box-shadow: 0 4px 16px rgba(28,90,122,.3); }
+svg.lines { position: absolute; inset: 0; width: 1280px; height: 720px; pointer-events: none; }
+
+/* slide 1 */
+.pills { position: absolute; left: 72px; top: 76px; display: flex; gap: 14px; }
+.pill { font: 600 17px var(--head); letter-spacing: .05em; padding: 0 22px; height: 46px; display: flex; align-items: center; border-radius: 999px; }
+.pill.o { background: var(--orange); color: #fff; }
+.pill.w { background: var(--card); color: var(--navy); border: 1.5px solid var(--line); }
+.s1 h1 { position: absolute; left: 72px; top: 268px; font-size: 142px; margin: 0; line-height: 1; }
+.s1 .tag { position: absolute; left: 72px; top: 580px; font: 600 42px var(--head); color: var(--orange); margin: 0; }
+.s1 .team { position: absolute; left: 72px; top: 662px; font-size: 18px; color: var(--muted); margin: 0; }
+.s1 .logo { position: absolute; left: 564px; top: 295px; width: 102px; height: 102px; border-radius: 50%; background: var(--peach); display: grid; place-items: center; }
+
+/* icons */
+.ic { display: grid; place-items: center; border-radius: 50%; background: var(--peach); color: var(--ico); flex: none; }
+.ic svg { display: block; }
+.bi { display: inline-flex; flex: none; opacity: .95; }
+
+/* slide 4 flow */
+.flow { margin-top: 18px; display: flex; flex-direction: column; }
+.arrow { height: 28px; display: flex; justify-content: center; align-items: center; }
+.arrow svg { display: block; }
+.bar { border-radius: 10px; height: 52px; padding: 0 18px; font: 600 19px var(--body); letter-spacing: .005em; color: #fff; display: flex; align-items: center; gap: 12px; }
+.bar.n { background: var(--bar); color: var(--peach2); font: 700 21px var(--head); }
+.row3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 18px; }
+.sources { display: flex; align-items: center; gap: 22px; padding: 0 26px; height: 64px; border: 1px solid var(--line); box-shadow: none; font: 700 23px var(--head); color: var(--navy); }
+.sources .mini { display: flex; justify-content: space-between; flex: 1; margin-left: 24px; color: var(--ico); }
+.est { background: var(--peach2); color: #2a1206; border-radius: 10px; padding: 10px 18px; display: flex; align-items: center; gap: 16px; }
+.est .bi { color: var(--ico); }
+.est b { font: 700 22px var(--head); display: block; }
+.est span.s { font-size: 17px; font-weight: 500; }
+.split { display: grid; grid-template-columns: 1fr 44px 1fr; align-items: center; }
+.split > .arrow { height: 28px; }
+.box { border-radius: 10px; padding: 12px 18px 14px; color: #fff; }
+.box.g { background: var(--teal); } .box.r { background: var(--red); }
+.box h4 { margin: 0 0 9px; font: 500 19px var(--body); letter-spacing: .005em; white-space: nowrap; }
+.tags { display: flex; gap: 8px; }
+.tags span { flex: 1; background: #fff; border-radius: 6px; padding: 8px 4px; text-align: center; font: 700 17px var(--body); }
+.box.g .tags span { color: var(--navy); } .box.r .tags span { color: var(--red); }
+.rec { background: var(--bar); border-radius: 10px; height: 60px; padding: 0 18px; display: grid; grid-template-columns: 380px 1fr 1fr 1fr; gap: 12px; align-items: center; color: var(--peach2); font: 700 21px var(--head); white-space: nowrap; }
+.rec .lab { display: flex; align-items: center; gap: 12px; }
+.rec .o { background: var(--navy2); border-radius: 6px; height: 38px; display: grid; place-items: center; color: #eef5fa; font: 600 18px var(--body); }
+
+/* slide 5 */
+.s5 .grid { display: grid; grid-template-columns: 410px 1fr; gap: 20px; margin-top: 26px; }
+.big { background: var(--navy); color: #fff; border-radius: 16px; padding: 32px; height: 400px; }
+.big small { font: 700 13px var(--body); letter-spacing: .14em; opacity: .85; }
+.big .n { font: 700 72px var(--head); color: var(--peach2); margin: 70px 0 8px; }
+.big .r { font: 700 18px var(--body); }
+.big p { margin: 8px 0; font-size: 16px; opacity: .9; }
+.items { display: flex; flex-direction: column; gap: 14px; }
+.item { display: flex; align-items: center; gap: 18px; padding: 16px 22px; }
+.item .ic { width: 42px; height: 42px; }
+.item .t { flex: 1; } .item .t b { font: 700 20px var(--head); display: block; color: var(--navy); }
+.item .t span { font-size: 15px; color: var(--muted); }
+.item .p { font: 700 24px var(--head); color: var(--navy); }
+
+/* slide 6 */
+.s6 .grid { display: grid; grid-template-columns: 1fr 340px; gap: 20px; margin-top: 26px; }
+table { width: 100%; border-collapse: collapse; font-size: 19px; color: var(--ink); }
+th, td { padding: 13px 14px; border-bottom: 1px solid var(--line); text-align: right; }
+th:first-child, td:first-child { text-align: left; }
+th { font: 700 15px var(--body); color: var(--muted); letter-spacing: .06em; text-transform: uppercase; }
+tr.tot td { font-weight: 700; border-bottom: 0; background: var(--peach); }
+td.fx { color: var(--teal); font-weight: 700; }
+.stats { display: flex; flex-direction: column; gap: 14px; }
+.stat { padding: 18px 22px; display: flex; align-items: center; gap: 16px; }
+.stat .ic { width: 44px; height: 44px; }
+.stat.dark .ic { background: rgba(255,255,255,.14); color: var(--peach2); }
+.stat b { font: 700 38px var(--head); color: var(--navy); display: block; }
+.stat span { font-size: 16px; color: var(--muted); }
+.stat.dark { background: var(--navy); } .stat.dark b { color: var(--peach2); } .stat.dark span { color: #dcebf4; }
+
+/* slide 7 */
+.s7 { background: var(--navy); padding-top: 50px; }
+.s7 .eyebrow { margin-top: 0; }
+.s7 h2 { color: #fff; font-size: 58px; margin-top: 18px; }
+.s7 .cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 34px; }
+.s7 .card { padding: 22px 22px 20px; height: 258px; box-shadow: 0 10px 28px rgba(8,28,44,.28); }
+.s7 .card .ic { width: 60px; height: 60px; margin-bottom: 16px; }
+.s7 .card b { font: 700 36px var(--head); color: var(--navy); display: block; margin-bottom: 10px; line-height: 1.1; }
+.s7 .card span { font-size: 19px; color: var(--muted); line-height: 1.55; display: block; text-wrap: pretty; }
+.s7 .banner { margin-top: 72px; background: var(--peach2); border-radius: 18px; height: 118px; padding: 0 34px; display: flex; align-items: center; font: 700 41px var(--head); color: #2a1206; }
+
+/* slide 8 */
+.s8 .lede { font-size: 22px; color: var(--muted); margin-top: 14px; text-wrap: balance; }
+.s8 .cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; margin-top: 28px; align-items: stretch; }
+.s8 .card { padding: 22px; min-height: 230px; }
+.s8 .card .ic { width: 44px; height: 44px; margin-bottom: 14px; }
+.s8 .card { padding: 22px 20px 20px; min-height: 230px; display: flex; flex-direction: column; }
+.s8 .card b { font: 700 20px var(--head); color: var(--navy); display: block; margin-bottom: 10px; line-height: 1.2; white-space: nowrap; letter-spacing: -.01em; }
+.s8 .card span { font-size: 17px; color: var(--muted); line-height: 1.5; display: block; text-wrap: pretty; }
+.s8 .banner { margin-top: 22px; background: var(--navy); color: #fff; border-radius: 18px; padding: 24px 34px; }
+.s8 .banner b { font: 700 34px var(--head); color: var(--peach2); display: block; }
+.s8 .banner span { font-size: 18px; opacity: .92; display: block; margin-top: 4px; }
+.s8 .foot { bottom: 26px; }
+.eyebrow.light { color: var(--peach2); }
+
+/* thank you */
+.s9 { background: var(--navy); }
+.s9 .pills { top: 76px; }
+.s9 .pill.w { background: transparent; color: #fff; border-color: rgba(255,255,255,.45); }
+.s9 .hero { position: absolute; left: 72px; top: 250px; display: flex; align-items: center; gap: 30px; }
+.s9 h1 { margin: 0; font-size: 150px; line-height: 1; color: #fff; white-space: nowrap; }
+.s9 .logo { width: 110px; height: 110px; flex: none; border-radius: 50%; background: var(--peach); display: grid; place-items: center; }
+.s9 .tag { position: absolute; left: 72px; top: 450px; font: 600 42px var(--head); color: var(--peach2); }
+.s9 .sub { position: absolute; left: 72px; top: 520px; font-size: 22px; color: #dcebf4; }
+.s9 .team { position: absolute; left: 72px; top: 650px; font-size: 18px; color: #b9d3e3; }
+
+/* controls */
+#controls { flex: none; display: flex; align-items: center; justify-content: center; gap: 14px; padding: 6px 12px 12px; color: var(--ctl-mute); font: 600 14px var(--body); }
+#controls button { border: 0; background: var(--ctl-bg); color: var(--ctl-fg); width: 44px; height: 44px; border-radius: 50%; font-size: 20px; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,.15); }
+#controls button:disabled { opacity: .35; cursor: default; }
+#dots { display: flex; gap: 7px; }
+#dots i { width: 9px; height: 9px; border-radius: 50%; background: var(--ctl-dot); cursor: pointer; display: block; }
+#dots i.on { background: var(--orange); width: 24px; border-radius: 5px; }
+@media (prefers-reduced-motion: reduce) { .slide.active { animation: none; } }
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="viewport"><div id="frame"><div id="stage">
+
+    <!-- 1 -->
+    <section class="slide s1">
+      <div class="pills"><span class="pill o">AI for Good Design Challenge</span><span class="pill w">Against All Oddz</span></div>
+      <h1>Fetch</h1>
+      <div class="logo"><svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="#e08b3c" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg></div>
+      <div class="tag">Stop searching. Start helping.</div>
+      <div class="team">Team AniTech · Amanda Ross · Prateek Ghosh · Sakshi Bhasin · Vaishnavi Lokhande · Viral Koshti</div>
+    </section>
+
+    <!-- 2 -->
+    <section class="slide s2" id="s2">
+      <div class="eyebrow">The problem</div>
+      <h2>One animal. Ten places to look.</h2>
+      <div class="foot" style="bottom:54px;font-size:24px;color:var(--navy);font-weight:700">The information exists. It just does not exist <i>together</i>.</div>
+    </section>
+
+    <!-- 3 -->
+    <section class="slide s3" id="s3">
+      <div class="eyebrow">Impact</div>
+      <h2>One case. Every source. Sorted.</h2>
+      <div class="foot" style="bottom:54px;font-size:24px;color:var(--navy);font-weight:700">Nothing gets moved or replaced. Fetch reads where the information already lives.</div>
+    </section>
+
+    <!-- 4 -->
+    <section class="slide s4" style="padding-top:44px">
+      <div class="eyebrow">Innovative solution</div>
+      <h2 style="font-size:42px">What happens when a message arrives.</h2>
+      <div class="flow">
+        <div class="card sources"><span data-hub></span>All sources
+          <div class="mini"><span data-ic="send" data-s="28" data-b></span><span data-ic="users" data-s="28" data-b></span><span data-ic="play" data-s="28" data-b></span><span data-ic="message" data-s="28" data-b></span><span data-ic="database" data-s="28" data-b></span><span data-ic="calendar" data-s="28" data-b></span><span data-ic="cap" data-s="28" data-b></span><span data-ic="bars" data-s="28" data-b></span><span data-ic="book" data-s="28" data-b></span><span data-ic="cloud" data-s="28" data-b></span></div>
+        </div>
+        <div class="arrow" data-arr></div>
+        <div class="bar n"><span data-ic="message" data-s="22" data-b></span>1 · AI opens one case per animal and asks what is missing</div>
+        <div class="arrow" data-arr></div>
+        <div class="row3">
+          <div class="bar" style="background:var(--red)"><span data-ic="alert" data-s="20" data-b></span>2 · High: cruelty, bites, legal</div>
+          <div class="bar" style="background:var(--amber);color:#2a1206"><span data-ic="search" data-s="20" data-b></span>Medium: check the flags</div>
+          <div class="bar" style="background:var(--teal)"><span data-ic="check" data-s="20" data-b></span>Low: a volunteer takes it</div>
+        </div>
+        <div class="arrow" data-arr></div>
+        <div class="est"><span data-ic="bars" data-s="22" data-b></span><div><b>Cost Estimator - Time, Money, etc.</b><span class="s">Re-checked every time a new record arrives, not just at intake.</span></div></div>
+        <div class="split"><div class="arrow" data-arr></div><div></div><div class="arrow" data-arr></div></div>
+        <div class="split">
+          <div class="box g"><h4>Within budget · 3 · On the board, assigned by priority and skill</h4><div class="tags"><span>Intake</span><span>Evaluation</span><span>Vet care</span><span>Foster</span><span>Adoption</span></div></div>
+          <div class="arrow" data-arr="r"></div>
+          <div class="box r"><h4>We cannot · 4 · Matched to who can</h4><div class="tags"><span>SPCA</span><span>Rescues</span><span>Trainers</span><span>Vet aid</span></div></div>
+        </div>
+        <div class="split"><div class="arrow" data-arr></div><div></div><div class="arrow" data-arr></div></div>
+        <div class="rec"><div class="lab"><span data-ic="bulb" data-s="22" data-b></span>5 · Every case leaves a record</div><div class="o">Answers, with sources</div><div class="o">Trends across cases</div><div class="o">Evidence for grants</div></div>
+      </div>
+    </section>
+
+    <!-- 5 -->
+    <section class="slide s5">
+      <div class="eyebrow ln">What it costs</div>
+      <h2>About $1,000 a month, fully supported.</h2>
+      <div class="grid">
+        <div class="big"><small>MONTHLY, ALL-IN</small><div class="n">~$1,000</div><div class="r">$700 to $1,700 range</div><p>About $2 per request</p><p style="font-size:14px;opacity:.75">Shared across 20 rescues: roughly $300 to $600 each.</p></div>
+        <div class="items">
+          <div class="card item"><div class="ic" data-ic="database" data-s="22"></div><div class="t"><b>Hosting, database and backups</b><span>Monitoring, logins and file storage</span></div><div class="p">$100 to 250</div></div>
+          <div class="card item"><div class="ic" data-ic="bulb" data-s="22"></div><div class="t"><b>AI reading and drafting</b><span>Reads messages, estimates cost, drafts replies</span></div><div class="p">$50 to 150</div></div>
+          <div class="card item"><div class="ic" data-ic="message" data-s="22"></div><div class="t"><b>Text and phone line</b><span>One number for texts and voicemail</span></div><div class="p">$20 to 40</div></div>
+          <div class="card item"><div class="ic" data-ic="wrench" data-s="22"></div><div class="t"><b>Maintenance and support</b><span>5 to 10 hours a month of updates and fixes</span></div><div class="p">$500 to 1,250</div></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 6 -->
+    <section class="slide s6">
+      <div class="eyebrow ln">What it saves</div>
+      <h2>16 minutes back on every request.</h2>
+      <div class="grid">
+        <div class="card" style="padding:14px 18px">
+          <table>
+            <tr><th>Per request</th><th>Today</th><th>Fetch</th></tr>
+            <tr><td>Find the message</td><td>3 min</td><td class="fx">0</td></tr>
+            <tr><td>Retype it into Shelterluv</td><td>6 min</td><td class="fx">1 min</td></tr>
+            <tr><td>Decide priority and who takes it</td><td>4 min</td><td class="fx">1 min</td></tr>
+            <tr><td>Write the reply</td><td>3 min</td><td class="fx">1 min</td></tr>
+            <tr><td>Match follow-ups to the right animal</td><td>4 min</td><td class="fx">1 min</td></tr>
+            <tr class="tot"><td>Total</td><td>20 min</td><td>4 min</td></tr>
+          </table>
+        </div>
+        <div class="stats">
+          <div class="card stat"><div class="ic" data-ic="clock" data-s="22"></div><div><b>130 hrs</b><span>of staff time back each month</span></div></div>
+          <div class="card stat"><div class="ic" data-ic="dollar" data-s="22"></div><div><b>$2,700</b><span>of time saved a month, at $20 an hour</span></div></div>
+          <div class="card stat dark"><div class="ic" data-ic="zap" data-s="22"></div><div><b>2.7x</b><span>return on the $1,000 all-in cost</span></div></div>
+        </div>
+      </div>
+      <div class="foot">Also: replies in minutes, not days. Assumes roughly 500 messages a month; step times to be confirmed with AAO staff.</div>
+    </section>
+
+    <!-- 7 -->
+    <section class="slide s7">
+      <div class="eyebrow light">Feasibility</div>
+      <h2>What it saves.</h2>
+      <div class="cards">
+        <div class="card"><div class="ic" data-ic="clock" data-s="28"></div><b>Time</b><span>An animal's full history in minutes, not hours.</span></div>
+        <div class="card"><div class="ic" data-ic="bars" data-s="28"></div><b>Money</b><span>Know the true cost before you commit.</span></div>
+        <div class="card"><div class="ic" data-ic="zap" data-s="28"></div><b>Energy</b><span>Volunteers take the easy cases, staff take the hard ones.</span></div>
+        <div class="card"><div class="ic" data-ic="home" data-s="28"></div><b>Animals</b><span>More time helping animals, less on paperwork.</span></div>
+      </div>
+      <div class="banner">Same staff. Same budget. More animals.</div>
+    </section>
+
+    <!-- 8 -->
+    <section class="slide s8">
+      <div class="eyebrow ln">Future development</div>
+      <h2>One shared rescue network.</h2>
+      <div class="lede">Today a rescue says no and the owner gets a phone number. Tomorrow the animal gets a new home.</div>
+      <div class="cards">
+        <div class="card"><div class="ic" data-ic="home" data-s="22"></div><b>More animals saved</b><span>Full or over budget, the case goes to a partner with room instead of being turned away.</span></div>
+        <div class="card"><div class="ic" data-ic="clock" data-s="22"></div><b>Hours per transfer</b><span>The partner gets the whole story in one click. No phone tag, no retyping records.</span></div>
+        <div class="card"><div class="ic" data-ic="lock" data-s="22"></div><b>Each rescue in control</b><span>Your data stays yours. A case is shared only when you choose to share it.</span></div>
+        <div class="card"><div class="ic" data-ic="users" data-s="22"></div><b>Easy to join</b><span>Rescues keep the tools they already use. Nothing to switch, nothing to buy.</span></div>
+      </div>
+      <div class="banner"><b>Every rescue that joins is one more place to say yes.</b><span>AAO today, Western New York next, statewide after that.</span></div>
+    </section>
+
+    <!-- 9 -->
+    <section class="slide s9">
+      <div class="pills"><span class="pill o">AI for Good Design Challenge</span><span class="pill w">Against All Oddz</span></div>
+      <div class="hero"><h1>Thank you.</h1>
+      <div class="logo"><svg width="50" height="50" viewBox="0 0 24 24" fill="none" stroke="#b8642c" stroke-width="1.6" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg></div></div>
+      <div class="tag">Stop searching. Start helping.</div>
+      <div class="sub">Questions and ideas are welcome.</div>
+      <div class="team">Team AniTech · Amanda Ross · Prateek Ghosh · Sakshi Bhasin · Vaishnavi Lokhande · Viral Koshti</div>
+    </section>
+
+    <div id="morph"></div>
+
+  </div></div></div>
+  <div id="controls">
+    <button id="prev" aria-label="Previous slide">‹</button>
+    <div id="dots"></div>
+    <span id="count"></span>
+    <button id="next" aria-label="Next slide">›</button>
+  </div>
+</div>
+
+<script>
+(function () {
+  var sources = ["Email","Facebook","Voicemail","Texts","Shelterluv","Vet records","Trainer notes","Spreadsheets","Paper files","Photos"];
+  var NS = "http://www.w3.org/2000/svg";
+  var P = {
+    send: '<path d="M22 2 11 13"/><path d="M22 2l-7 20-4-9-9-4z"/>',
+    users: '<circle cx="9" cy="7" r="3.5"/><path d="M2.5 21v-1.5a5 5 0 0 1 5-5h3a5 5 0 0 1 5 5V21"/><path d="M16 3.5a3.5 3.5 0 0 1 0 7"/><path d="M21.5 21v-1.5a5 5 0 0 0-3.5-4.7"/>',
+    play: '<path d="M6 3.5 19 12 6 20.5z"/>',
+    message: '<path d="M21 11.5a8.4 8.4 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.4 8.4 0 0 1-3.8-.9L3 21l1.9-5.7a8.4 8.4 0 0 1-.9-3.8A8.5 8.5 0 0 1 8.7 3.9 8.4 8.4 0 0 1 12.5 3h.5a8.5 8.5 0 0 1 8 8z"/><path d="M8.5 11.5h.01M12 11.5h.01M15.5 11.5h.01"/>',
+    database: '<ellipse cx="12" cy="5" rx="8" ry="3"/><path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5"/><path d="M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3"/>',
+    calendar: '<rect x="3" y="4" width="18" height="17" rx="2"/><path d="M8 2v4M16 2v4M3 9h18"/><path d="M7 17l3-3 2.5 2L16 12"/>',
+    cap: '<path d="M22 9 12 4 2 9l10 5z"/><path d="M6 11.5V16c3 3 9 3 12 0v-4.5"/><path d="M22 9v6"/>',
+    bars: '<path d="M6 21v-7M12 21V4M18 21V10"/><path d="M3 21h18"/>',
+    book: '<path d="M2 4h6a4 4 0 0 1 4 4v13a3 3 0 0 0-3-3H2z"/><path d="M22 4h-6a4 4 0 0 0-4 4v13a3 3 0 0 1 3-3h7z"/>',
+    cloud: '<path d="M17.5 19H9a7 7 0 1 1 6.7-9h1.8a4.5 4.5 0 0 1 0 9z"/>',
+    alert: '<path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><path d="M12 9v4M12 17h.01"/>',
+    search: '<circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/>',
+    check: '<circle cx="12" cy="12" r="9.5"/><path d="M8 12.5l3 3 5-6"/>',
+    bulb: '<path d="M9 18h6M10 22h4"/><path d="M12 2a7 7 0 0 0-4 12.7c.6.5 1 1.2 1 2V17h6v-.3c0-.8.4-1.5 1-2A7 7 0 0 0 12 2z"/>',
+    clock: '<circle cx="12" cy="12" r="9.5"/><path d="M12 6.5V12l3.5 2"/>',
+    dollar: '<path d="M12 2v20"/><path d="M17 6H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>',
+    zap: '<path d="M13 2 3 14h9l-1 8 10-12h-9z"/>',
+    home: '<path d="M3 10l9-7 9 7v10a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9 22V12h6v10"/>',
+    lock: '<rect x="3.5" y="11" width="17" height="11" rx="2"/><path d="M7.5 11V7a4.5 4.5 0 0 1 9 0v4"/>',
+    wrench: '<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.8-3.8a6 6 0 0 1-7.9 7.9l-6.9 6.9a2.1 2.1 0 0 1-3-3l6.9-6.9a6 6 0 0 1 7.9-7.9z"/>'
+  };
+  function icon(name, size, sw) {
+    return '<svg width="' + size + '" height="' + size + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="' + (sw || 1.5) + '" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">' + P[name] + '</svg>';
+  }
+  document.querySelectorAll("[data-ic]").forEach(function (el) {
+    el.innerHTML = icon(el.getAttribute("data-ic"), +el.getAttribute("data-s") || 22);
+    if (el.hasAttribute("data-b")) el.classList.add("bi");
+  });
+  document.querySelectorAll("[data-arr]").forEach(function (el) {
+    var r = el.getAttribute("data-arr") === "r";
+    el.innerHTML = '<svg width="' + (r ? 36 : 22) + '" height="' + (r ? 22 : 22) + '" viewBox="0 0 22 22" fill="var(--arr)"' + (r ? ' style="transform:rotate(-90deg);width:22px;height:22px"' : '') + '><path d="M8 1h6v9h4l-7 10L4 10h4z"/></svg>';
+  });
+  document.querySelectorAll("[data-hub]").forEach(function (el) {
+    var g = '<circle cx="29" cy="29" r="7.5" fill="#2d5a78"/>';
+    for (var i = 0; i < 12; i++) {
+      var a = i * Math.PI / 6, x = 29 + 20 * Math.cos(a), y = 29 + 20 * Math.sin(a);
+      g += '<line x1="' + (29 + 11 * Math.cos(a)) + '" y1="' + (29 + 11 * Math.sin(a)) + '" x2="' + (29 + 17 * Math.cos(a)) + '" y2="' + (29 + 17 * Math.sin(a)) + '" stroke="#d48f4c" stroke-width="1.6"/><circle cx="' + x + '" cy="' + y + '" r="3" fill="#d48f4c"/>';
+    }
+    el.innerHTML = '<svg width="58" height="58" viewBox="0 0 58 58">' + g + '</svg>';
+  });
+  var chipIcons = ["send","users","play","message","database","calendar","cap","bars","book","cloud"];
+  function chip(parent, text, x, y, rot, ic) {
+    var d = document.createElement("div");
+    d.className = "chip";
+    d.innerHTML = icon(chipIcons[ic], 20, 1.4) + text;
+    d.style.left = x + "px"; d.style.top = y + "px";
+    if (rot) d.style.transform = "rotate(" + rot + "deg)";
+    parent.appendChild(d);
+    return d;
+  }
+  function line(svg, x1, y1, x2, y2, color, w) {
+    var l = document.createElementNS(NS, "line");
+    l.setAttribute("x1", x1); l.setAttribute("y1", y1); l.setAttribute("x2", x2); l.setAttribute("y2", y2);
+    l.setAttribute("stroke", color); l.setAttribute("stroke-width", w); l.setAttribute("stroke-opacity", ".55");
+    svg.appendChild(l);
+  }
+
+  // shared layer: the tangled web (slide 2) morphs into the hub (slide 3)
+  var layer = document.getElementById("morph");
+  var svgA = document.createElementNS(NS, "svg"), svgB = document.createElementNS(NS, "svg");
+  svgA.setAttribute("class", "lines"); svgB.setAttribute("class", "lines");
+  layer.appendChild(svgA); layer.appendChild(svgB);
+  var hub = document.createElement("div");
+  hub.className = "hub";
+  hub.innerHTML = '<svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#f8cb92" stroke-width="2" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg>Fetch';
+  var cx = 640, cy = 360, rx = 440, ry = 150;
+  hub.style.left = (cx - 62) + "px"; hub.style.top = (cy - 62) + "px";
+  layer.appendChild(hub);
+  var pos2 = [[170,200,-4],[880,170,6],[330,300,5],[760,250,-5],[520,330,3],[960,360,4],[190,400,-3],[640,430,5],[860,470,-4],[420,490,2]];
+  var chips = sources.map(function (name, i) { return chip(layer, name, 0, 0, 0, i); });
+  var A = [], B = [];
+  function layout() {
+    var z = stage.style.zoom; stage.style.zoom = "1";
+    while (svgA.firstChild) svgA.removeChild(svgA.firstChild);
+    while (svgB.firstChild) svgB.removeChild(svgB.firstChild);
+    var cA = [];
+    chips.forEach(function (c, i) {
+      var w = c.offsetWidth, h = c.offsetHeight;
+      A[i] = { x: pos2[i][0], y: pos2[i][1], r: pos2[i][2] };
+      var a = (-90 + i * 36) * Math.PI / 180;
+      var bx = cx + rx * Math.cos(a), by = cy + ry * Math.sin(a);
+      B[i] = { x: bx - w / 2, y: by - h / 2, r: 0 };
+      cA.push([A[i].x + w / 2, A[i].y + h / 2]);
+      line(svgB, cx, cy, bx, by, "#d9a679", 2);
+    });
+    [[0,3],[1,2],[2,5],[3,9],[4,6],[6,7],[7,8],[5,9],[0,4],[1,7]].forEach(function (pr) {
+      line(svgA, cA[pr[0]][0], cA[pr[0]][1], cA[pr[1]][0], cA[pr[1]][1], "#9aaab5", 2);
+    });
+    stage.style.zoom = z;
+  }
+  var mstate = null;
+  function morph(state) {
+    if (state === mstate) return;
+    var wasHidden = mstate === null;
+    if (state === null) { layer.classList.remove("show"); mstate = null; return; }
+    if (wasHidden) layer.classList.add("snap");
+    var P = state === "a" ? A : B;
+    chips.forEach(function (c, i) {
+      c.style.transform = "translate(" + P[i].x + "px," + P[i].y + "px) rotate(" + P[i].r + "deg)";
+    });
+    if (state === "a") {
+      svgB.style.transition = "opacity .25s ease"; hub.style.transition = "opacity .25s ease, transform .35s ease";
+      svgA.style.transition = "opacity .5s ease .6s";
+    } else {
+      svgA.style.transition = "opacity .25s ease";
+      svgB.style.transition = "opacity .5s ease .7s"; hub.style.transition = "opacity .4s ease .5s, transform .6s cubic-bezier(.3,1.4,.5,1) .5s";
+    }
+    svgA.style.opacity = state === "a" ? 1 : 0;
+    svgB.style.opacity = state === "b" ? 1 : 0;
+    hub.style.opacity = state === "b" ? 1 : 0;
+    hub.style.transform = state === "b" ? "scale(1)" : "scale(.3)";
+    if (wasHidden) { void layer.offsetWidth; layer.classList.remove("snap"); }
+    layer.classList.add("show");
+    mstate = state;
+  }
+
+  // deck engine
+  var slides = Array.prototype.slice.call(document.querySelectorAll(".slide"));
+  var frame = document.getElementById("frame"), stage = document.getElementById("stage");
+  var vp = document.getElementById("viewport");
+  var dots = document.getElementById("dots"), count = document.getElementById("count");
+  var prev = document.getElementById("prev"), next = document.getElementById("next");
+  var idx = 0;
+  slides.forEach(function (_, i) {
+    var d = document.createElement("i");
+    d.addEventListener("click", function () { go(i); });
+    dots.appendChild(d);
+  });
+  function go(i) {
+    idx = Math.max(0, Math.min(slides.length - 1, i));
+    slides.forEach(function (s, k) { s.classList.toggle("active", k === idx); });
+    Array.prototype.forEach.call(dots.children, function (d, k) { d.classList.toggle("on", k === idx); });
+    morph(idx === 1 ? "a" : idx === 2 ? "b" : null);
+    count.textContent = (idx + 1) + " / " + slides.length;
+    prev.disabled = idx === 0; next.disabled = idx === slides.length - 1;
+    try { history.replaceState(null, "", "#" + (idx + 1)); } catch (e) {}
+  }
+  function fit() {
+    var w = vp.clientWidth - 16, h = vp.clientHeight - 16;
+    var s = Math.min(w / 1280, h / 720);
+    if (s <= 0) return;
+    if ("zoom" in document.documentElement.style) { stage.style.transform = "none"; stage.style.zoom = s; }
+    else { stage.style.transform = "scale(" + s + ")"; }
+    frame.style.width = (1280 * s) + "px"; frame.style.height = (720 * s) + "px";
+  }
+  prev.addEventListener("click", function () { go(idx - 1); });
+  next.addEventListener("click", function () { go(idx + 1); });
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "ArrowRight" || e.key === " " || e.key === "PageDown") { e.preventDefault(); go(idx + 1); }
+    if (e.key === "ArrowLeft" || e.key === "PageUp") { e.preventDefault(); go(idx - 1); }
+    if (e.key === "Home") go(0);
+    if (e.key === "End") go(slides.length - 1);
+  });
+  var tx = null;
+  frame.addEventListener("touchstart", function (e) { tx = e.touches[0].clientX; }, { passive: true });
+  frame.addEventListener("touchend", function (e) {
+    if (tx === null) return;
+    var dx = e.changedTouches[0].clientX - tx; tx = null;
+    if (Math.abs(dx) > 40) go(idx + (dx < 0 ? 1 : -1));
+  });
+  window.addEventListener("resize", fit);
+  var start = parseInt((location.hash || "").replace("#", ""), 10);
+  fit();
+  layout();
+  go(isNaN(start) ? 0 : start - 1);
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(function () { fit(); layout(); var m = mstate; mstate = null; layer.classList.add("snap"); morph(m); void layer.offsetWidth; layer.classList.remove("snap"); });
+})();
+</script>
+</body>
+</html>
