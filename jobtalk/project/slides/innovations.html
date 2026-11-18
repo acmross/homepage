@@ -1,0 +1,87 @@
+<section id="innovations" data-transition="fade">
+<div class="head" style="position:absolute; left:140px; top:104px; width:1640px"><p class="k">TEACHING · INNOVATIONS</p><h2>Making hidden decisions visible</h2><p>From my midterm teaching demo: "Your slicer is a compiler"</p></div>
+<x-embed style="position:absolute; left:140px; top:370px; width:840px; height:520px">
+<!doctype html><html><head><meta charset="utf-8"><style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:#F4F4F2;border-radius:20px;padding:26px;width:840px;height:520px;overflow:hidden;color:#444}
+.hd{font-size:24px;font-weight:700;letter-spacing:3px;color:#1F4E8C;padding-bottom:18px}
+.g{display:grid;grid-template-columns:1fr 1fr;grid-template-rows:1fr 1fr;gap:14px;height:372px}
+.s{background:#fff;border-radius:14px;padding:18px 20px;position:relative;overflow:hidden;border:4px solid #fff;animation:on 8s infinite}
+.s h4{font-size:27px;font-weight:700;color:#111}.s p{font-size:21px;color:#777}
+.s2{animation-delay:2s}.s3{animation-delay:4s}.s4{animation-delay:6s}
+@keyframes on{0%,22%{border-color:#1F4E8C}26%,100%{border-color:#fff}}
+.cube{position:absolute;right:50px;bottom:30px;width:64px;height:64px;transform-style:preserve-3d;transform:rotateX(-24deg) rotateY(-30deg);animation:spin 8s ease-in-out infinite}
+.cube b{position:absolute;left:0;top:0;width:64px;height:64px;border:4px solid #111;background:rgba(31,78,140,.14);border-radius:3px}
+.cube b:nth-child(1){transform:translateZ(32px)}.cube b:nth-child(2){transform:rotateY(180deg) translateZ(32px)}.cube b:nth-child(3){transform:rotateY(90deg) translateZ(32px)}.cube b:nth-child(4){transform:rotateY(-90deg) translateZ(32px)}.cube b:nth-child(5){transform:rotateX(90deg) translateZ(32px)}.cube b:nth-child(6){transform:rotateX(-90deg) translateZ(32px)}
+@keyframes spin{0%{transform:rotateX(-24deg) rotateY(-30deg)}25%,100%{transform:rotateX(-24deg) rotateY(60deg)}}
+.lay{position:absolute;right:30px;bottom:18px;width:104px;height:72px}
+.lay i{position:absolute;left:0;width:104px;height:7px;background:#111;border-radius:2px;animation:st 8s infinite}
+.lay i:nth-child(1){bottom:0;animation-delay:2.00s}.lay i:nth-child(2){bottom:11px;animation-delay:2.25s}.lay i:nth-child(3){bottom:22px;animation-delay:2.50s}
+.lay i:nth-child(4){bottom:33px;animation-delay:2.75s}.lay i:nth-child(5){bottom:44px;animation-delay:3.00s}.lay i:nth-child(6){bottom:55px;animation-delay:3.25s}
+@keyframes st{0%{opacity:0;transform:translateY(-12px)}5%,100%{opacity:1;transform:translateY(0)}}
+.path{position:absolute;right:26px;bottom:14px;width:120px;height:84px}
+@keyframes sw{0%,50%{opacity:.2}52%,74%{opacity:1}76%,100%{opacity:.2}}
+.gc{position:absolute;right:16px;bottom:12px;width:176px;font-family:ui-monospace,Menlo,Consolas,monospace;font-size:15px;font-weight:600;line-height:1.35;color:#111}
+.gc em{font-style:normal;color:#1F4E8C}
+.gc u{text-decoration:none;display:inline-block;width:8px;height:14px;background:#1F4E8C;vertical-align:-2px;margin-left:3px;}
+@keyframes bl{0%,100%{opacity:1}}
+.gc span{display:block}
+.gc span:nth-child(1){animation:t1 8s linear 6s infinite}.gc span:nth-child(2){animation:t2 8s linear 6s infinite}.gc span:nth-child(3){animation:t3 8s linear 6s infinite}
+@keyframes t1{0%{opacity:0}4%,100%{opacity:1}}@keyframes t2{0%,7%{opacity:0}11%,100%{opacity:1}}@keyframes t3{0%,14%{opacity:0}18%,100%{opacity:1}}
+@keyframes dr{0%{stroke-dashoffset:420}22%,100%{stroke-dashoffset:0}}
+.ft{font-size:22px;color:#777;padding-top:14px;text-align:center}
+</style></head><body>
+<div class="hd">4 DECISIONS A 3D PRINTER MAKES FOR YOU</div>
+<div class="g">
+<div class="s"><h4>1 · Model</h4><p>You draw a shape</p><div class="cube"><b></b><b></b><b></b><b></b><b></b><b></b></div></div>
+<div class="s s2"><h4>2 · Layers</h4><p>It picks the thickness</p><div class="lay"><i></i><i></i><i></i><i></i><i></i><i></i></div></div>
+<div class="s s3"><h4>3 · Toolpath</h4><p>It picks the route</p><svg class="path" viewBox="0 0 120 84"><rect x="3" y="3" width="114" height="78" rx="5" fill="none" stroke="#111" stroke-width="5"/><path d="M16 68 V18 H32 V66 H48 V18 H64 V66 H80 V18 H96 V60" fill="none" stroke="#1F4E8C" stroke-width="5" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="420" style="animation:dr 8s linear 4s infinite"/><path d="M96 70 l-8 -13 h16 z" fill="#1F4E8C"/></svg></div>
+<div class="s s4"><h4>4 · G-code</h4><p>It writes the code</p><div class="gc"><span><em>G1</em> X92 Y41 E2.4</span><span><em>G1</em> X92 Y58 E2.9</span><span><em>G1</em> Z0.4 F900<u></u></span></div></div>
+</div>
+<div class="ft">The visualizer I built. Students step through each stage.</div>
+</body></html>
+</x-embed>
+<div style="position:absolute; left:1040px; top:370px; width:740px; display:flex; flex-direction:column; gap:22px">
+<h3>Then: predict, and test</h3>
+<svg aria-label="Two printed rods resting on supports and pushed down in the middle. The rod printed upright, with layers stacked along its length, snaps. The rod printed flat, with layers running the length, bends and holds." width="740" height="330" viewBox="0 0 740 330">
+<rect x="0" y="0" width="740" height="330" fill="#F4F6F8" rx="14"/>
+<text x="185" y="46" text-anchor="middle" font-family="Inter, sans-serif" font-size="24" font-weight="600" fill="#16202B">Printed upright</text>
+<text x="555" y="46" text-anchor="middle" font-family="Inter, sans-serif" font-size="24" font-weight="600" fill="#16202B">Printed flat</text>
+<g transform="rotate(7 80 150)"><rect x="80" y="126" width="100" height="48" rx="4" fill="#FFFFFF" stroke="#111111" stroke-width="4"/><g stroke="#1F4E8C" stroke-width="4"><line x1="105" y1="130" x2="105" y2="170"/><line x1="130" y1="130" x2="130" y2="170"/><line x1="155" y1="130" x2="155" y2="170"/></g></g>
+<g transform="rotate(-7 290 150)"><rect x="190" y="126" width="100" height="48" rx="4" fill="#FFFFFF" stroke="#111111" stroke-width="4"/><g stroke="#1F4E8C" stroke-width="4"><line x1="215" y1="130" x2="215" y2="170"/><line x1="240" y1="130" x2="240" y2="170"/><line x1="265" y1="130" x2="265" y2="170"/></g></g>
+<path d="M185 128 l-7 16 l12 10 l-10 12 l8 14" fill="none" stroke="#C0392B" stroke-width="5" stroke-linejoin="round"/>
+<path d="M185 78 v34" stroke="#111111" stroke-width="5"/><path d="M185 122 l-9 -16 h18 z" fill="#111111"/><text x="185" y="70" text-anchor="middle" font-family="Inter, sans-serif" font-size="20" fill="#4A5561">push</text><path d="M92 182 l-14 22 h28 z" fill="#111111"/><path d="M278 182 l-14 22 h28 z" fill="#111111"/>
+<path d="M450 128 Q555 142 660 128 L660 172 Q555 186 450 172 Z" fill="#FFFFFF" stroke="#111111" stroke-width="4" stroke-linejoin="round"/>
+<g fill="none" stroke="#1F4E8C" stroke-width="4"><path d="M456 141 Q555 155 654 141"/><path d="M456 151 Q555 165 654 151"/><path d="M456 161 Q555 175 654 161"/></g>
+<path d="M555 78 v34" stroke="#111111" stroke-width="5"/><path d="M555 122 l-9 -16 h18 z" fill="#111111"/><text x="555" y="70" text-anchor="middle" font-family="Inter, sans-serif" font-size="20" fill="#4A5561">push</text><path d="M462 182 l-14 22 h28 z" fill="#111111"/><path d="M648 182 l-14 22 h28 z" fill="#111111"/>
+<text x="185" y="232" text-anchor="middle" font-family="Inter, sans-serif" font-size="22" fill="#4A5561">Layers stacked along the rod</text>
+<text x="185" y="268" text-anchor="middle" font-family="Inter, sans-serif" font-size="26" font-weight="600" fill="#C0392B">Snaps</text>
+<text x="555" y="232" text-anchor="middle" font-family="Inter, sans-serif" font-size="22" fill="#4A5561">Layers running the length</text>
+<text x="555" y="268" text-anchor="middle" font-family="Inter, sans-serif" font-size="26" font-weight="600" fill="#1F4E8C">Holds</text>
+<line x1="370" y1="70" x2="370" y2="290" stroke="#D5DAE0" stroke-width="2"/>
+</svg>
+<p class="sm">Same part, two print directions. Students write down which one breaks first. Then we break them.</p>
+<p class="sm" style="color:#1F4E8C;width:796px;box-sizing:border-box">Full demo: acmross.github.io/inside-the-print/slides</p>
+</div>
+<p class="foot">Amanda Ross · Faculty Candidate Talk · <span class="pagenum"></span></p>
+<aside>Addresses: Innovations in teaching (active learning, visualization tools, technology in teaching).
+
+CUES
+- From my midterm teaching demo
+- The visualizer on the left is mine, it's running live
+- A slicer makes four decisions you never see
+- Two rods: guess which snaps, then break them
+- AI writes the bad code so no student gets called out
+- Graded full marks in CSE 502
+
+SAY IT
+This is from my midterm teaching demo this semester. I call the lesson "Your slicer is a compiler."
+
+On the left is the interactive visualizer I made. When you 3D print something, the slicer software makes a bunch of decisions for you. How thick the layers are. Where the walls go. Students step through each stage themselves and see what got decided for them.
+
+Then the fun part. I hand out two printed rods. Same part, just printed in two different directions. Everybody writes down which one will snap first. Then we break them. Most people guess wrong, and that's the point. Now they want to know why.
+
+I do the same thing with AI. I have the AI write bad code, and we pick it apart together. Nobody's embarrassed, because nobody in the room wrote it.
+
+(~55 seconds. If you have the rods, break one here.)</aside>
+</section>

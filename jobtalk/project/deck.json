@@ -1,0 +1,65 @@
+{
+  "v": 5,
+  "createdOnFiles": {
+    "v": 1,
+    "at": "2026-11-15T01:05:00Z"
+  },
+  "lists": "css",
+  "format": {
+    "v": 1,
+    "shared": [
+      "project/deck.css"
+    ]
+  },
+  "title": "Faculty Candidate Talk - Amanda Ross",
+  "order": [
+    "cover",
+    "roadmap",
+    "philosophy",
+    "innovations",
+    "experience",
+    "cad",
+    "courses",
+    "ranger",
+    "berkeley",
+    "nolapse",
+    "nolapse2",
+    "tortoise",
+    "anitech",
+    "nordson",
+    "sate",
+    "hackathons",
+    "agenda",
+    "undergrads",
+    "integration",
+    "contributions",
+    "leadership",
+    "values",
+    "close"
+  ],
+  "sections": {
+    "open": {
+      "description": "Title and what is coming.",
+      "start": "cover"
+    },
+    "teaching": {
+      "description": "Teaching statement: philosophy, innovations, experience, courses.",
+      "start": "philosophy"
+    },
+    "research": {
+      "description": "Research statement: motivation, one slide per project, then goals and undergraduate involvement.",
+      "start": "ranger"
+    },
+    "vision": {
+      "description": "Integration and vision: intersection, contributions, values.",
+      "start": "integration"
+    }
+  },
+  "faces": {
+    "inter": {
+      "family": "Inter",
+      "href": "https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap"
+    }
+  },
+  "designSystems": []
+}
